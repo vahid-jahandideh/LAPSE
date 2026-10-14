@@ -7,9 +7,9 @@ experiment specification and is recorded with every estimate.
 
 ## Relation spaces
 
-Write the original input and final output shares as a matrix $B$ with $2n$
+Write the original input and final output shares as a matrix $`B`$ with $`2n`$
 rows over the independent source variables. For a leakage instance with row
-matrix $L$, define
+matrix $`L`$, define
 
 ```math
 H_L=\{a\in\mathbb F_q^{2n}:aB\in\operatorname{rowspan}(L)\}.
@@ -21,7 +21,7 @@ The compiler retains original input SSA sites and final output SSA sites;
 intermediate versions remain independent physical leakage sites.
 
 The analyzer requires a proper fresh refresh: equal, nonempty input and output
-sharings; preserved share sum; and $\operatorname{rank}(B) = 2n - 1$. Thus the only leak-free
+sharings; preserved share sum; and $`\operatorname{rank}(B) = 2n - 1`$. Thus the only leak-free
 boundary relation is
 
 ```math
@@ -39,7 +39,7 @@ also excludes the public correctness relation. Simply discarding correctness
 as a single row is insufficient: a known relation can be shifted by any
 multiple of correctness, changing its support without changing its information.
 
-For example, leaking only $X_1$ gives the relation $X_1 = c$. Adding correctness
+For example, leaking only $`X_1`$ gives the relation $`X_1 = c`$. Adding correctness
 also gives a relation containing the other boundary coordinates. Counting every
 such shifted consequence would affect all shares. Selecting a representative
 by row-reduction pivots instead would make affection depend on coordinate order.
@@ -48,8 +48,8 @@ The code offers two named policies. Numerical output always records the policy.
 
 ## Separated policy
 
-Let $I_L$ be the subspace of $H_L$ supported on input coordinates only, and
-$O_L$ the subspace supported on output coordinates only. Define the residual
+Let $`I_L`$ be the subspace of $`H_L`$ supported on input coordinates only, and
+$`O_L`$ the subspace supported on output coordinates only. Define the residual
 coupling space
 
 ```math
@@ -61,7 +61,7 @@ The implemented exposure set is
 ```math
 \operatorname{Aff}_{\mathrm{sep}}(L)=
 \begin{cases}
-\operatorname{supp}(I_L)\cup\operatorname{supp}(O_L), &\dim C_L=0,\\
+\operatorname{supp}(I_L)\cup\operatorname{supp}(O_L), &\dim C_L=0,\\[0pt]
 \mathbf X\cup\mathbf Y, &\dim C_L>0.
 \end{cases}
 ```
@@ -70,34 +70,34 @@ Here the support of a subspace is the union of the supports of its vectors;
 computing it on any basis gives the same result. All quantities are independent
 of elimination pivots and ordering of leakage sites.
 
-$C_L$ removes both correctness and relations already explained separately on
+$`C_L`$ removes both correctness and relations already explained separately on
 the two sides. Given the native, a zero residual means that the affine boundary
 constraints split into input-only and output-only constraints. Exposing their
 supports is sufficient to provide their values. A nonzero residual triggers
 exposure of every boundary share; this is a conservative choice for that
 instance, rather than an attempt to find a minimal set of participating shares.
 
-To see the conditional-distribution interpretation, let $h_X=(1,\ldots,1,0,\ldots,0)$.
-Fixing the native changes the constraint space to $H'_L=H_L+\operatorname{span}(h_X)$.
-Its one-sided subspaces are $I_L+\operatorname{span}(h_X)$ and
-$O_L+\operatorname{span}(h_Y)$, where $h_Y=(0,\ldots,0,1,\ldots,1)$ and
-$h_X-h_Y$ generates correctness. The conditional affine space is a Cartesian
+To see the conditional-distribution interpretation, let $`h_X=(1,\ldots,1,0,\ldots,0)`$.
+Fixing the native changes the constraint space to $`H'_L=H_L+\operatorname{span}(h_X)`$.
+Its one-sided subspaces are $`I_L+\operatorname{span}(h_X)`$ and
+$`O_L+\operatorname{span}(h_Y)`$, where $`h_Y=(0,\ldots,0,1,\ldots,1)`$ and
+$`h_X-h_Y`$ generates correctness. The conditional affine space is a Cartesian
 product on its input and output coordinates exactly when these one-sided
-subspaces span $H'_L$, equivalently when $C_L=0$. Uniform independent sources
+subspaces span $`H'_L`$, equivalently when $`C_L=0`$. Uniform independent sources
 induce a uniform distribution on this affine space. This establishes the
 per-instance separation test, not independent domination across random leakage
 instances.
 
 This distinguishes genuine residual coupling from the sum of two already known
-one-sided relations. For example, independently leaking $X_1$ and $Y_2$ affects
+one-sided relations. For example, independently leaking $`X_1`$ and $`Y_2`$ affects
 only those shares. Their sum is a cross-boundary relation, but it introduces no
 additional dependence.
 
 Important limitation: this policy's affected set need not be monotone in the
-leakage set. In the two-share refresh $Y_1=X_1+R$, $Y_2=X_2-R$, observing $R$
-leaves a coupled residual and exposes all four shares. Observing $R$ and $X_1$
-also determines $Y_1$; the residual vanishes and the exposure set becomes
-$\{X_1,Y_1\}$. Therefore the manuscript's monotone diagram-covering arguments and
+leakage set. In the two-share refresh $`Y_1=X_1+R`$, $`Y_2=X_2-R`$, observing $`R`$
+leaves a coupled residual and exposes all four shares. Observing $`R`$ and $`X_1`$
+also determines $`Y_1`$; the residual vanishes and the exposure set becomes
+$`\{X_1,Y_1\}`$. Therefore the manuscript's monotone diagram-covering arguments and
 its independence claims for inflated exposures cannot automatically be applied
 to this policy. The computed marginal probability is not by itself a proof of
 independent domination or of the composition theorem.
@@ -110,7 +110,7 @@ additional boundary relations and all their correctness shifts:
 ```math
 \operatorname{Aff}_{\mathrm{lit}}(L)=
 \begin{cases}
-\emptyset,&H_L=H_0,\\
+\emptyset,&H_L=H_0,\\[0pt]
 \mathbf X\cup\mathbf Y,&H_L\ne H_0.
 \end{cases}
 ```
@@ -123,12 +123,12 @@ support. The default policy for local exposure is `separated`.
 
 ## Conditional sampling and reported quantities
 
-For a selected boundary SSA wire $U$, the implementation removes exactly that
+For a selected boundary SSA wire $`U`$, the implementation removes exactly that
 wire from the sampling universe and samples every remaining allowed site at
-rate $p$. This is precisely the conditional distribution given that $U$ does
+rate $`p`$. This is precisely the conditional distribution given that $`U`$ does
 not leak. Other SSA wires with the same vector, including copied boundaries,
 remain sampleable. The selected wire must have been eligible under the chosen
-leakage-role filter. At $p=1$ the conditioning event has probability zero, so
+leakage-role filter. At $`p=1`$ the conditioning event has probability zero, so
 the API rejects the request.
 
 The returned estimate is
@@ -145,7 +145,7 @@ nonmonotone event. Confidence diagnostics describe sampling error; they do not
 resolve the mathematical policy distinction. Raw IS estimates are not clipped.
 
 As an analytic oracle, for the two-share refresh with exactly five leakage
-sites $X_1,X_2,R,Y_1,Y_2$, conditioning on $X_1$ not leaking gives
+sites $`X_1,X_2,R,Y_1,Y_2`$, conditioning on $`X_1`$ not leaking gives
 
 ```math
 \beta_{\mathrm{sep}}(p)=p-p^2+2p^3-p^4,\qquad
