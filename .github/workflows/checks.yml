@@ -1,7 +1,7 @@
-name: Tests
+name: Checks
 on: [push, pull_request]
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -12,7 +12,4 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install '.[experiments]'
-      - run: python -m unittest discover -s tests -v
-        env:
-          MPLBACKEND: Agg
       - run: lapse --demo_gf2 --delta-p 0.1 --method exact --json

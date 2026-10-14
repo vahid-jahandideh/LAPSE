@@ -87,13 +87,3 @@ For sum-preserving refresh circuits, LAPSE also estimates conditional boundary e
 lapse --file two_share.circ --n 2 --beta-p 0.1 \
   --boundary-share 'a[0]' --method exact --json
 ```
-
-## Tests
-
-```bash
-python -m pip install -e '.[experiments]'
-MPLBACKEND=Agg python -m unittest discover -s tests -v
-```
-
-Tests cover finite-field arithmetic, circuit semantics, algebraic probability oracles, estimator statistics, and command-line behavior. CI runs on Python 3.10–3.13.
-

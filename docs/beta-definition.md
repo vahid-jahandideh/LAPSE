@@ -152,9 +152,6 @@ sites $`X_1,X_2,R,Y_1,Y_2`$, conditioning on $`X_1`$ not leaking gives
 \beta_{\mathrm{lit}}(p)=1-(1-p)^4.
 ```
 
-The test suite checks these formulas over GF(2), GF(257), and GF(4), and checks
-the exact relation space against an independently enumerated GF(2) oracle.
-
 ## Applying the estimates
 
 Report the selected boundary SSA wire, leakage roles, field, circuit parameters,

@@ -37,8 +37,3 @@ masks each pair of off-diagonal entries with the same fresh random value, and
 sums each row. These operations preserve the target. Treating its matrix entries
 as independent source variables only models this linear subcircuit; it does not
 prove security of nonlinear multiplications that might supply those entries.
-
-The release tests check source/output conservation over several sizes for every
-supported refresh and for Compress, and compare the two-share one-round example
-with the paper's wire vectors. These are algebraic implementation checks, not
-full reproductions of the paper's experimental results or security theorems.

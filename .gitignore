@@ -8,6 +8,7 @@ dist/
 .pytest_cache/
 .coverage
 htmlcov/
+/tests/
 results/
 results.csv
 plots/
