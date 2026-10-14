@@ -81,7 +81,7 @@ Recovery means that the target vector belongs to the span of the leaked vectors.
 
 JSON and sweep CSV output include sample and hit counts, standard errors, confidence intervals, proposal rates, effective sample sizes, and warnings. MC uses a Wilson interval; IS uses an approximate normal interval and provides no interval for zero hits. At extreme probabilities, a few dominant weights or missed events can make IS estimates and intervals unreliable. Zero hits do not establish zero probability, and a fixed seed establishes repeatability, not accuracy. Raw IS estimates and reliability warnings are retained. Sweeps also write a metadata sidecar with the circuit, parameters, versions, and seeds.
 
-For sum-preserving refresh circuits, LAPSE also estimates conditional boundary exposure β under an explicit reduction policy. The default `separated` policy excludes public correctness consequences and conservatively exposes all boundary shares when cross-boundary dependence remains. This per-share quantity does not establish independence between shares. See the [β definition and limitations](docs/beta-definition.md).
+For sum-preserving refresh circuits, LAPSE also estimates conditional boundary exposure β. It excludes public correctness consequences and conservatively exposes all boundary shares when cross-boundary dependence remains after accounting for input-only and output-only relations. This per-share quantity does not establish independence between shares. See the [β definition and limitations](docs/beta-definition.md).
 
 ```bash
 lapse --file two_share.circ --n 2 --beta-p 0.1 \

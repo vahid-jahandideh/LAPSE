@@ -31,7 +31,6 @@ class EstimatorCfg:
     method: str = 'auto'
     pilot_samples: int = 1000
     boundary_share: Optional[str] = None
-    beta_policy: str = 'separated'
 
 
 def build_ir_for_n(n, circuit_text, extra_params=None):
@@ -81,7 +80,7 @@ def grid_values(n_values, p_values, cfg, circuit_text, do_delta=True, extra_para
                 if not cfg.boundary_share:
                     raise ValueError('beta requires --boundary-share')
                 result = result_dict(estimate_beta(
-                    ir, p, cfg.boundary_share, policy=cfg.beta_policy,
+                    ir, p, cfg.boundary_share,
                     allow_roles=set(cfg.allow_roles) if cfg.allow_roles is not None else None,
                     method='is' if cfg.mc_q is not None else cfg.method,
                     samples=cfg.samples, max_enum=cfg.max_enum, q=cfg.mc_q,
@@ -197,7 +196,6 @@ def parse_args(argv=None):
     ap.add_argument('--params', default='')
     ap.add_argument('--metric', choices=['delta', 'beta', 'recovery-beta'], default='delta')
     ap.add_argument('--boundary-share', help='Boundary share for beta, e.g. a[0]')
-    ap.add_argument('--beta-policy', choices=['separated', 'literal'], default='separated')
     ns = ap.add_mutually_exclusive_group()
     ns.add_argument('--n-list', type=int, nargs='+')
     ns.add_argument('--n-range', type=int, nargs=3, metavar=('START', 'STOP', 'STEP'))
@@ -241,7 +239,7 @@ def main(argv=None):
             raise ValueError('--mc-q requires --method auto or is')
         cfg = EstimatorCfg(args.samples, args.max_enum, args.mc_q,
                            sorted(roles) if roles is not None else None,
-                           args.seed, args.method, args.pilot_samples, args.boundary_share, args.beta_policy)
+                           args.seed, args.method, args.pilot_samples, args.boundary_share)
         df = grid_values(ns, ps, cfg, text,
                          do_delta=args.metric in ('delta', 'recovery-beta'),
                          extra_params=params, do_beta=args.metric in ('beta', 'recovery-beta'))

@@ -1,9 +1,8 @@
-# Boundary affection and the implemented beta policies
+# Boundary affection and conditional exposure
 
 LAPSE computes conditional boundary exposure using exact finite-field relation
-spaces. The default `separated` policy excludes consequences that arise only
-by adding the public correctness relation. The exposure policy is part of the
-experiment specification and is recorded with every estimate.
+spaces. Its definition excludes consequences that arise only by adding the
+public correctness relation.
 
 ## Relation spaces
 
@@ -32,7 +31,7 @@ This check rejects identity gadgets with two or more shares, incomplete outputs,
 and circuits with additional boundary dependencies.
 They need a model that accounts for their nontrivial baseline dependencies.
 
-## Why a policy must be specified
+## Excluding public correctness consequences
 
 The manuscript defines affected shares using support of boundary relations and
 also excludes the public correctness relation. Simply discarding correctness
@@ -44,9 +43,7 @@ also gives a relation containing the other boundary coordinates. Counting every
 such shifted consequence would affect all shares. Selecting a representative
 by row-reduction pivots instead would make affection depend on coordinate order.
 
-The code offers two named policies. Numerical output always records the policy.
-
-## Separated policy
+## Affected shares
 
 Let $`I_L`$ be the subspace of $`H_L`$ supported on input coordinates only, and
 $`O_L`$ the subspace supported on output coordinates only. Define the residual
@@ -59,7 +56,7 @@ C_L=H_L/(H_0+I_L+O_L).
 The implemented exposure set is
 
 ```math
-\operatorname{Aff}_{\mathrm{sep}}(L)=
+\operatorname{Aff}(L)=
 \begin{cases}
 \operatorname{supp}(I_L)\cup\operatorname{supp}(O_L), &\dim C_L=0,\\[0pt]
 \mathbf X\cup\mathbf Y, &\dim C_L>0.
@@ -93,33 +90,14 @@ one-sided relations. For example, independently leaking $`X_1`$ and $`Y_2`$ affe
 only those shares. Their sum is a cross-boundary relation, but it introduces no
 additional dependence.
 
-Important limitation: this policy's affected set need not be monotone in the
+The affected set need not be monotone in the
 leakage set. In the two-share refresh $`Y_1=X_1+R`$, $`Y_2=X_2-R`$, observing $`R`$
 leaves a coupled residual and exposes all four shares. Observing $`R`$ and $`X_1`$
 also determines $`Y_1`$; the residual vanishes and the exposure set becomes
 $`\{X_1,Y_1\}`$. Therefore the manuscript's monotone diagram-covering arguments and
 its independence claims for inflated exposures cannot automatically be applied
-to this policy. The computed marginal probability is not by itself a proof of
+to this definition. The computed marginal probability is not by itself a proof of
 independent domination or of the composition theorem.
-
-## Literal policy
-
-The optional `literal` policy discards the baseline-only case but counts all
-additional boundary relations and all their correctness shifts:
-
-```math
-\operatorname{Aff}_{\mathrm{lit}}(L)=
-\begin{cases}
-\emptyset,&H_L=H_0,\\[0pt]
-\mathbf X\cup\mathbf Y,&H_L\ne H_0.
-\end{cases}
-```
-
-Every nonzero information class has a representative involving each coordinate,
-because correctness has a nonzero coefficient in each coordinate. Thus even a
-single leaked input share affects every boundary share under this policy. This
-allows comparison with an interpretation that counts every correctness-shifted
-support. The default policy for local exposure is `separated`.
 
 ## Conditional sampling and reported quantities
 
@@ -142,21 +120,21 @@ Results are per selected share. Symmetry is not assumed or inferred merely
 from a circuit name. Exact enumeration, Monte Carlo, and importance sampling
 use the same event. MC and likelihood-ratio IS remain valid for a deterministic
 nonmonotone event. Confidence diagnostics describe sampling error; they do not
-resolve the mathematical policy distinction. Raw IS estimates are not clipped.
+establish the assumptions of analytical bounds or composition results. Raw IS
+estimates are not clipped.
 
 As an analytic oracle, for the two-share refresh with exactly five leakage
 sites $`X_1,X_2,R,Y_1,Y_2`$, conditioning on $`X_1`$ not leaking gives
 
 ```math
-\beta_{\mathrm{sep}}(p)=p-p^2+2p^3-p^4,\qquad
-\beta_{\mathrm{lit}}(p)=1-(1-p)^4.
+\beta_{X_1}(p)=p-p^2+2p^3-p^4.
 ```
 
 ## Applying the estimates
 
-Report the selected boundary SSA wire, leakage roles, field, circuit parameters,
-and exposure policy. Any use of analytical bounds or composition results must
-establish that their assumptions apply to that policy. In particular, the
+Report the selected boundary SSA wire, leakage roles, field, and circuit parameters.
+Any use of analytical bounds or composition results must establish that their
+assumptions apply to this definition. In particular, the
 manuscript's essential-bridge definition tests removal by correctness alone;
-the separated policy tests residual coupling modulo correctness and both
+LAPSE tests residual coupling modulo correctness and both
 one-sided spaces. These tests have different mathematical meanings.

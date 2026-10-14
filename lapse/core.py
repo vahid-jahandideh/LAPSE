@@ -1645,8 +1645,6 @@ def main(argv=None):
     ap.add_argument('--delta-p', type=float, help='Recovery probability E_X at probing rate p')
     ap.add_argument('--beta-p', type=float, help='Conditional boundary exposure at probing rate p < 1')
     ap.add_argument('--boundary-share', help='Boundary share for beta, e.g. a[0] or b[0] (or exact SSA name)')
-    ap.add_argument('--beta-policy', choices=['separated', 'literal'], default='separated',
-                    help='Explicit boundary reduction convention; see docs/beta-definition.md')
     ap.add_argument('--beta-q', type=float, help='IS proposal rate for beta; implies method is for beta')
     ap.add_argument('--method', choices=['auto', 'exact', 'mc', 'is'], default='auto')
     ap.add_argument('--max-enum', type=int, default=20, help='Maximum wire count for exact enumeration (default: 20)')
@@ -1697,7 +1695,7 @@ def main(argv=None):
         if args.beta_p is not None:
             from lapse.boundary import estimate_beta
             output['beta'] = result_dict(estimate_beta(
-                ir, args.beta_p, args.boundary_share, policy=args.beta_policy, allow_roles=roles,
+                ir, args.beta_p, args.boundary_share, allow_roles=roles,
                 method='is' if args.beta_q is not None else args.method, samples=args.mc_samples,
                 max_enum=args.max_enum, q=args.beta_q, seed=args.seed, pilot_samples=args.pilot_samples))
         if args.json:
@@ -1717,7 +1715,7 @@ def main(argv=None):
                     print(f"WARNING: {warning}")
             if 'beta' in output:
                 result = output['beta']
-                print(f"beta(p={args.beta_p:g}, U={result['boundary_share']}, policy={result['policy']}) = {result['estimate']:.12g}")
+                print(f"beta(p={args.beta_p:g}, U={result['boundary_share']}) = {result['estimate']:.12g}")
                 print(f"Effective marginal rate p' = {result['p_effective']:.12g}")
                 print(f"Standard error: {result['standard_error']}; 95% interval: {result['confidence_interval']}")
                 for warning in result['warnings']:

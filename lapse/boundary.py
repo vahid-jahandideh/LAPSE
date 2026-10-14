@@ -1,17 +1,14 @@
-"""Boundary relation algebra and explicitly specified conditional exposure policies.
+"""Boundary relation algebra and conditional exposure probability.
 
-See ``docs/beta-definition.md`` before interpreting either policy as the paper's
-beta. Public correctness creates a quotient ambiguity in relation support; this
-module never resolves that ambiguity through an undocumented pivot convention.
+Consequences obtained only by adding public correctness to a one-sided relation
+do not affect additional shares. See ``docs/beta-definition.md`` for the precise
+definition of the exposure event.
 """
 
 from dataclasses import asdict, dataclass
 from typing import Tuple
 
 from lapse import core as rpt
-
-
-POLICIES = ("literal", "separated")
 
 
 def _binary(field):
@@ -109,7 +106,6 @@ def _dependencies(rows, field):
 class BoundaryRelations:
     """Bases use the coordinate order in ``boundary_shares``; RHSs are omitted."""
 
-    policy: str
     boundary_shares: Tuple[str, ...]
     affected_shares: Tuple[str, ...]
     baseline_dimension: int
@@ -125,9 +121,8 @@ class BoundaryRelations:
 
 @dataclass(frozen=True)
 class BetaEstimate(rpt.RecoveryEstimate):
-    """Conditional exposure estimate, including its explicit semantic policy."""
+    """Exposure estimate conditioned on the selected boundary site not leaking."""
 
-    policy: str = ""
     boundary_share: str = ""
     conditional: bool = True
     p_effective: float = 0.0
@@ -179,9 +174,7 @@ class _BoundaryModel:
             raise ValueError(f"Unknown or ambiguous boundary share {name!r}; choose one of {', '.join(self.names)}")
         return matches[0]
 
-    def analyze(self, leaked, policy, *, details=False, target=None):
-        if policy not in POLICIES:
-            raise ValueError(f"policy must be one of {', '.join(POLICIES)}")
+    def analyze(self, leaked, *, details=False, target=None):
         if self.binary:
             basis = _binary_basis([self.packed_wires[name] for name in leaked])
             residuals = [_binary_reduce(row, basis) for row in self.packed]
@@ -213,11 +206,8 @@ class _BoundaryModel:
         coupled = len(relations) - len(inputs) - len(outputs) - (0 if known else 1)
         if coupled < 0:
             raise ArithmeticError("Inconsistent boundary quotient dimensions")
-        if ((policy == 'literal' and len(relations) > 1)
-                or (policy == 'separated' and coupled > 0)):
+        if coupled > 0:
             support = (1 << len(self.names)) - 1
-        elif policy == 'literal':
-            support = 0
         if not details:
             return bool(support >> target & 1)
         if self.binary:
@@ -227,7 +217,7 @@ class _BoundaryModel:
             outputs = [unpack(row, self.n) for row in outputs]
         zeros = (self.field.zero(),) * self.n
         return BoundaryRelations(
-            policy, self.names,
+            self.names,
             tuple(name for i, name in enumerate(self.names) if support >> i & 1),
             1, len(relations), len(inputs), len(outputs), coupled, known,
             tuple(tuple(row) for row in relations),
@@ -241,7 +231,7 @@ def boundary_shares(ir):
     return _BoundaryModel(ir).names
 
 
-def inspect_boundary_relations(ir, leaked_ssa, *, policy):
+def inspect_boundary_relations(ir, leaked_ssa):
     """Inspect exact relation spaces for an explicit subset of SSA leakage sites."""
     model = _BoundaryModel(ir)
     leaked_ssa = list(leaked_ssa)
@@ -249,24 +239,22 @@ def inspect_boundary_relations(ir, leaked_ssa, *, policy):
     unknown = set(leaked_ssa) - allowed
     if unknown:
         raise ValueError(f"Unknown or nonleakable SSA sites: {', '.join(sorted(unknown))}")
-    return model.analyze(leaked_ssa, policy, details=True)
+    return model.analyze(leaked_ssa, details=True)
 
 
-def estimate_beta(ir, p, boundary_share, *, policy, allow_roles=None,
+def estimate_beta(ir, p, boundary_share, *, allow_roles=None,
                   method="auto", samples=10000, max_enum=20, q=None,
                   seed=None, rng=None, pilot_samples=1000):
     """Estimate affection conditioned on the selected SSA site not leaking.
 
     Exactly that site is removed from independent Bernoulli sampling; copies
     with the same value remain separate sites. ``p=1`` is undefined because the
-    conditioning event has probability zero. The separated event need not be
+    conditioning event has probability zero. The exposure event need not be
     monotone; both MC and ordinary likelihood-ratio IS still apply.
     """
     p = rpt._validate_probability(p, 'p')
     if p == 1.0:
         raise ValueError("beta is undefined at p=1: the conditioning event has probability zero")
-    if policy not in POLICIES:
-        raise ValueError(f"policy must be one of {', '.join(POLICIES)}")
     model = _BoundaryModel(ir)
     selected = model.resolve(boundary_share)
     candidates = rpt.filter_leakables(ir.created, ir.secret_ssa, allow_roles)
@@ -276,10 +264,10 @@ def estimate_beta(ir, p, boundary_share, *, policy, allow_roles=None,
     target = model.names.index(selected)
 
     def event(indices):
-        return model.analyze([candidates[index] for index in indices], policy, target=target)
+        return model.analyze([candidates[index] for index in indices], target=target)
 
     result = rpt.estimate_event(event, len(candidates), p, method=method, samples=samples,
                                 max_enum=max_enum, q=q, seed=seed, rng=rng,
                                 pilot_samples=pilot_samples)
-    return BetaEstimate(**asdict(result), policy=policy, boundary_share=selected,
+    return BetaEstimate(**asdict(result), boundary_share=selected,
                         conditional=True, p_effective=p + (1.0 - p) * result.estimate)
