@@ -15,7 +15,7 @@ share that takes part in such a relation is *affected*.
 For a boundary share $`U`$ and probing rate $`p`$, LAPSE computes
 
 ```math
-\beta_U(p)=\Pr\bigl[\,U\in\operatorname{Aff}(\mathcal L)\ \big|\ U\notin\mathcal L\,\bigr],
+\beta_U(p)=\Pr\bigl[\,U\in\mathrm{Aff}(\mathcal L)\ \big|\ U\notin\mathcal L\,\bigr],
 ```
 
 the probability that $`U`$ is affected although $`U`$ itself did not leak.
@@ -118,7 +118,7 @@ fresh randomness). For a leakage instance whose leaked wire vectors form the
 matrix $`L`$, the known boundary relations are the coefficient vectors
 
 ```math
-H_L=\{a\in\mathbb F_q^{2n} : aB\in\operatorname{rowspan}(L)\}.
+H_L=\{a\in\mathbb F_q^{2n} : aB\in\mathrm{rowspan}(L)\}.
 ```
 
 Their right-hand sides are known values. Public constants in the circuit do not
@@ -126,7 +126,7 @@ change $`H_L`$. Inside $`H_L`$, LAPSE distinguishes:
 
 | Space | Meaning |
 | --- | --- |
-| $`H_0=\operatorname{span}\{(1,\ldots,1,-1,\ldots,-1)\}`$ | correctness, always contained in $`H_L`$ |
+| $`H_0=\mathrm{span}\{(1,\ldots,1,-1,\ldots,-1)\}`$ | correctness, always contained in $`H_L`$ |
 | $`I_L`$ | relations in $`H_L`$ with a zero output part (input-only) |
 | $`O_L`$ | relations in $`H_L`$ with a zero input part (output-only) |
 | $`C_L=H_L/(H_0+I_L+O_L)`$ | essential bridges: what correctness and one-sided relations do not explain |
@@ -134,9 +134,9 @@ change $`H_L`$. Inside $`H_L`$, LAPSE distinguishes:
 The affected set is
 
 ```math
-\operatorname{Aff}(L)=
+\mathrm{Aff}(L)=
 \begin{cases}
-\operatorname{supp}(I_L)\cup\operatorname{supp}(O_L), & \dim C_L=0,\\[0pt]
+\mathrm{supp}(I_L)\cup\mathrm{supp}(O_L), & \dim C_L=0,\\[0pt]
 \mathbf X\cup\mathbf Y, & \dim C_L>0.
 \end{cases}
 ```
