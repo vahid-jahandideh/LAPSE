@@ -2,6 +2,8 @@
 
 **Linear Algebraic Probing Security Estimator** analyzes linear circuits in the random probing model. It compiles a circuit into wire vectors over a finite field and computes the probability that leaked wires span a specified target `S`. The same exact enumeration, Monte Carlo (MC), and importance sampling (IS) methods apply to all supported circuits.
 
+This target-recovery probability is denoted $E_X(n,p)$ in the paper, where $n$ is the number of shares in the paper's circuit families and $p$ is the independent per-wire probing probability.
+
 Repository: <https://github.com/vahid-jahandideh/LAPSE>
 
 ## Install
@@ -19,7 +21,7 @@ For CSV parameter sweeps and plots, install the optional dependencies with `pyth
 ## Usage
 
 ```bash
-# Exact target-recovery probability: 0.02152
+# Exact target-recovery probability E_X(2, 0.1): 0.02152
 lapse --file two_share.circ --n 2 --delta-p 0.1 --method exact
 
 # Check whether any set of at most one probe recovers S
@@ -35,6 +37,8 @@ lapse-sweep --file multi_refresh.circ --params rounds=1 \
   --outfile results/example.csv --plots-out results/plots
 ```
 
+The `--delta-p` option sets $p$ for computing $E_X(n,p)$. The recovery value appears as `recovery.estimate` in JSON output and as `delta` in sweep CSV files.
+
 The module entry points are `python -m lapse` and `python -m lapse.experiments`. Use `--help` to see all options. The Python API accepts circuit source directly:
 
 ```python
@@ -44,7 +48,7 @@ from lapse import build_ir, estimate_recovery, parse_program
 source = Path("two_share.circ").read_text()
 ir = build_ir(parse_program(source), {"n": 2})
 result = estimate_recovery(ir, 0.1, method="exact")
-print(result.estimate)
+print(result.estimate)  # E_X(2, 0.1)
 ```
 
 ## Circuit language and leakage model
@@ -93,12 +97,3 @@ MPLBACKEND=Agg python -m unittest discover -s tests -v
 
 Tests cover finite-field arithmetic, circuit semantics, algebraic probability oracles, estimator statistics, and command-line behavior. CI runs on Python 3.10–3.13.
 
-## Citation and license
-
-Please cite the accompanying paper when using LAPSE:
-
-> Vahid Jahandideh, Bart Mennink, and Lejla Batina. *Leakage-Diagrams, Importance Sampling, and Composition in the Random Probing Model*. Manuscript; publication details forthcoming.
-
-Software: **LAPSE: Linear Algebraic Probing Security Estimator**, version **0.1.0**, by the same authors. [Source repository](https://github.com/vahid-jahandideh/LAPSE).
-
-The code is available under the [MIT License](LICENSE).
