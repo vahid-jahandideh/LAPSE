@@ -12,4 +12,4 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install '.[experiments]'
-      - run: lapse --demo_gf2 --delta-p 0.1 --method exact --json
+      - run: lapse --demo_gf2 --recovery-p 0.1 --method exact --json

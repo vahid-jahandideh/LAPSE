@@ -21,7 +21,7 @@ The supported examples are:
 For example:
 
 ```bash
-python3 -m lapse --file multi_refresh.circ --n 2 --params rounds=1 --delta-p 0.01
+python3 -m lapse --file multi_refresh.circ --n 2 --params rounds=1 --recovery-p 0.01
 python3 -m lapse --file SNI_Refresh_field.circ --n 3 --t 1
 ```
 
@@ -30,7 +30,14 @@ For `n=2, rounds=1`, the paper lists eight nonconstant wires; this source also
 records the zero initialization. Probing that zero wire supplies no information
 and does not change the recovery probability. Equal-valued random, intermediate,
 and final-output wires remain distinct probe locations, matching the paper's
-example. Its exact recovery probability at `p=1/2` is `190/256`.
+example. Its exact recovery probability at `p=1/2` is `190/256`. Because each
+output `b[i]` copies the last version of `a[i]`, leaking that copied wire makes
+`b[i]` known; the boundary exposure β of an output share includes this event.
+
+The boundary exposure β ([definition](beta-definition.md)) applies to the
+refresh circuits `two_share.circ`, `multi_refresh.circ`, `SNI_Refresh.circ`,
+and `SNI_Refresh_field.circ`. `Compress.circ` maps `n*n` inputs to `n` outputs,
+so it is not a refresh and the β analysis rejects it.
 
 `Compress.circ` records the target sum of all matrix entries before masking,
 masks each pair of off-diagonal entries with the same fresh random value, and

@@ -31,7 +31,7 @@ CLI:
 Notes:
 - All declarations in one program must use the **same type** (field); mixed fields are rejected.
 - `S` (the secret target) is never probeable.
-- Random-probing δ(p) supports each of these finite fields.
+- The random-probing recovery probability E_X(p) (`--recovery-p`) supports each of these finite fields.
 
 Requires: lark  (pip install lark)
 License: MIT
@@ -1214,7 +1214,7 @@ def t_probing(ir: IR, t: int, allow_roles: Optional[set]) -> CheckResult:
                 return CheckResult(False, f"Found probe set of size {k} revealing S.", list(comb))
     return CheckResult(True, f"PASS: No probe set of size ≤ {t} reveals S.")
 
-# Random probing E_X(p) / delta(p)
+# Random-probing recovery probability E_X(p)
 
 def _validate_probability(value: float, name: str, *, interior: bool = False) -> float:
     try:
@@ -1642,7 +1642,8 @@ def main(argv=None):
     ap.add_argument('--params', default='', help='Comma-separated integer parameters, e.g. rounds=3')
     ap.add_argument('--t', type=int, help='Check recovery of S by at most t probes')
     ap.add_argument('--allow-roles', help='Comma-separated probeable roles (default: exclude const)')
-    ap.add_argument('--delta-p', type=float, help='Recovery probability E_X at probing rate p')
+    ap.add_argument('--recovery-p', type=float, metavar='P',
+                    help='Compute the recovery probability E_X at probing rate P')
     ap.add_argument('--beta-p', type=float, help='Conditional boundary exposure at probing rate p < 1')
     ap.add_argument('--boundary-share', help='Boundary share for beta, e.g. a[0] or b[0] (or exact SSA name)')
     ap.add_argument('--beta-q', type=float, help='IS proposal rate for beta; implies method is for beta')
@@ -1663,8 +1664,8 @@ def main(argv=None):
             raise ValueError('sample counts must be positive and max-enum nonnegative')
         if args.mc_q is not None and args.method not in ('auto', 'is'):
             raise ValueError('--mc-q requires --method auto or is')
-        if args.mc_q is not None and args.delta_p is None:
-            raise ValueError('--mc-q requires --delta-p')
+        if args.mc_q is not None and args.recovery_p is None:
+            raise ValueError('--mc-q requires --recovery-p')
         if args.beta_p is not None and args.boundary_share is None:
             raise ValueError('--beta-p requires --boundary-share, e.g. a[0]')
         if args.beta_q is not None and (args.beta_p is None or args.method not in ('auto', 'is')):
@@ -1687,9 +1688,9 @@ def main(argv=None):
         if args.t is not None:
             from dataclasses import asdict
             output['t_probing'] = asdict(t_probing(ir, args.t, roles))
-        if args.delta_p is not None:
+        if args.recovery_p is not None:
             output['recovery'] = result_dict(estimate_recovery(
-                ir, args.delta_p, roles, method='is' if args.mc_q is not None else args.method,
+                ir, args.recovery_p, roles, method='is' if args.mc_q is not None else args.method,
                 samples=args.mc_samples, max_enum=args.max_enum, q=args.mc_q,
                 seed=args.seed, pilot_samples=args.pilot_samples))
         if args.beta_p is not None:
@@ -1709,7 +1710,7 @@ def main(argv=None):
                     print('Counterexample: ' + ', '.join(check['counterexample']))
             if 'recovery' in output:
                 result = output['recovery']
-                print(f"E_X(p={args.delta_p:g}) = {result['estimate']:.12g} ({result['method']}, seed={args.seed})")
+                print(f"E_X(p={args.recovery_p:g}) = {result['estimate']:.12g} ({result['method']}, seed={args.seed})")
                 print(f"Standard error: {result['standard_error']}; 95% interval: {result['confidence_interval']}")
                 for warning in result['warnings']:
                     print(f"WARNING: {warning}")
