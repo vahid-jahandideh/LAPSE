@@ -1,0 +1,11 @@
+circuit two_share_mask(n);
+
+input bit a[2];
+rand  bit r;
+output bit b[2];
+
+b[0] = a[0] xor r;
+b[1] = a[1] xor r;
+
+const bit S;
+S = xor_reduce(a, 0, 2);

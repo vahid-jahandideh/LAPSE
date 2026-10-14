@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lapse-rpm"
+version = "0.1.0"
+description = "LAPSE: Linear Algebraic Probing Security Estimator"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dependencies = ["lark>=1.1.9,<2"]
+
+[project.optional-dependencies]
+experiments = ["numpy>=1.24,<3", "pandas>=2,<3", "matplotlib>=3.6,<4"]
+
+[project.urls]
+Repository = "https://github.com/vahid-jahandideh/LAPSE"
+Issues = "https://github.com/vahid-jahandideh/LAPSE/issues"
+
+[project.scripts]
+lapse = "lapse.core:main"
+lapse-sweep = "lapse.experiments:main"
+
+[tool.setuptools]
+packages = ["lapse"]

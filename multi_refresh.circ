@@ -1,0 +1,23 @@
+circuit multi_refresh(n, rounds);
+// Algorithm R-multi from the paper: rounds is the paper's k >= 1.
+input bit a[n];
+rand bit r[n];
+output bit b[n];
+
+const bit S;
+S = sum_reduce(a, 0, n);
+
+for k in [0 to rounds) {
+  r[n-1] = 0;
+  for i in [0 to n-1) {
+    r[i] = randbit();
+    r[n-1] = r[n-1] - r[i];
+  }
+  for i in [0 to n) {
+    a[i] = a[i] + r[i];
+  }
+}
+
+for i in [0 to n) {
+  b[i] = a[i];
+}

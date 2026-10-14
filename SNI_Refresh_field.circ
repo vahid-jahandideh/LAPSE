@@ -1,0 +1,21 @@
+circuit pairwise_refresh_prime(n);
+// Pairwise additive refresh over a prime field.
+input gf(257) a[n];
+rand  gf(257) r;
+output gf(257) b[n];
+
+const gf(257) S;
+S = sum_reduce(a, 0, n);
+
+for i in [0 .. n) { 
+  for j in [i+1 .. n) { 
+    r = rand();
+    a[i] = a[i] + r; 
+    a[j] = a[j] - r; 
+  }
+}
+
+for i in [0 to n) { 
+  b[i] = a[i];
+}
+

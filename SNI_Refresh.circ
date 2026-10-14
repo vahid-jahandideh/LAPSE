@@ -1,0 +1,19 @@
+circuit two_share_mask(n);
+input bit a[n];
+rand  bit r;
+output bit b[n];
+
+for i in [0 .. n) { 
+  for j in [i+1 .. n) { 
+    r = randbit();
+    a[i] = a[i] xor r; 
+    a[j] = a[j] xor r; 
+  }
+}
+
+for i in [0 .. n) { 
+  b[i] = a[i];
+}
+
+const bit S;
+S = sum_reduce(a, 0, n);

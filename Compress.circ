@@ -1,0 +1,27 @@
+circuit compress(n);
+// Linear Compress stage from the paper. a is a row-major n by n matrix.
+input bit a[n*n];
+rand  bit r;
+output bit b[n];
+
+// Record the target before the in-place masking updates.
+const bit S;
+S = sum_reduce(a, 0, n*n);
+
+for i in [0 to n) {
+  for j in [i+1 to n) {
+    r = randbit();
+    a[i*n + j] = a[i*n + j] xor r;
+    a[j*n + i] = a[j*n + i] xor r;
+  }
+}
+
+for i in [0 to n) {
+  b[i] = a[i*n + i];
+  for j in [0 to i) {
+    b[i] = b[i] xor a[i*n + j];
+  }
+  for j in [i+1 to n) {
+    b[i] = b[i] xor a[i*n + j];
+  }
+}
